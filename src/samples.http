@@ -28,3 +28,31 @@ Content-Type: application/json
     "password": "GrinchiFlinchi"
 
 }
+
+### LOGIN JOSEF
+POST http://localhost:3000/api/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Josef",
+    "password": "3456"
+
+}
+
+### LOGIN MARIA
+POST http://localhost:3000/api/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Maria",
+    "password": "2345"
+
+}
+
+
+
+
+
+### LOGGED IN USER
+GET http://localhost:3000/api/me HTTP/1.1
+

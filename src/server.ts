@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3000;
@@ -12,11 +13,13 @@ app.use((request, _response, next) => {
 // Middleware for parsing application/json
 app.use(express.json());
 
+app.use(cookieParser());
+
 const users = [
-  { name: 'Tri', email: 'tri@ding.de', password: '1234' },
-  { name: 'Tra', email: 'tra@ding.de', password: '2345' },
-  { name: 'Tru', email: 'tru@ding.de', password: '3456' },
-  { name: 'Lala', email: 'lala@ding.de', password: '4567' },
+  { name: 'Jesus', email: 'tri@ding.de', password: '1234' },
+  { name: 'Maria', email: 'tra@ding.de', password: '2345' },
+  { name: 'Josef', email: 'tru@ding.de', password: '3456' },
+  { name: 'Magdalena', email: 'lala@ding.de', password: '4567' },
 ];
 
 /* app.post('/api/users', (request, response) => {
@@ -25,6 +28,16 @@ const users = [
   users.push(newUser.name);
   response.send(`${newUser.name} added`);
 }); */
+
+app.get('/api/me', (request, response) => {
+  const username = request.cookies.username;
+  const foundUser = users.find((user) => user.name === username);
+  if (foundUser) {
+    response.send(foundUser);
+  } else {
+    response.status(404).send('User not found');
+  }
+});
 
 app.post('/api/users', (request, response) => {
   const newUser = request.body;
@@ -40,6 +53,21 @@ app.post('/api/users', (request, response) => {
   } else {
     users.push(newUser);
     response.send(users);
+  }
+});
+
+app.post('/api/login', (request, response) => {
+  const userCredentials = request.body;
+  const existingUsers = users.find(
+    (user) =>
+      user.name === userCredentials.name &&
+      user.password === userCredentials.password
+  );
+  if (existingUsers) {
+    response.setHeader('Set-Cookie', `username=${existingUsers.name}`);
+    response.send(`Welcome ${request.body.name} 👋🏼`);
+  } else {
+    response.send('You shall not pass 🥸');
   }
 });
 
