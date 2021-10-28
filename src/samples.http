@@ -1,33 +1,54 @@
 
    
 ### GET all users
-
 GET http://localhost:3000/api/users/ HTTP/1.1
 
-### GET a single user
 
-GET http://localhost:3000/api/users/Tri HTTP/1.1
+
+
+### GET a single user
+GET http://localhost:3000/api/users/TriTra-Bob HTTP/1.1
+
+
+
+
 
 ### GET a single user which doesn't exist
-
 GET http://localhost:3000/api/users/Tra HTTP/1.1
+
+
+
 
 ### Delete a user, which exists
 DELETE http://localhost:3000/api/users/Tri HTTP/1.1
 
+
+
+
 ### Delete a user, which DOES NOT exist
 DELETE http://localhost:3000/api/users/DingDong
 
-### POST a user
+
+
+
+
+### POST a user to MONGODB
 POST http://localhost:3000/api/users HTTP/1.1
 Content-Type: application/json
 
 {
-    "name": "TriTra-Bob",
-    "email": "bobby@bobbymail.com",
-    "password": "GrinchiFlinchi"
+    "name": "Britney Spears",
+    "email": "free@britney.com",
+    "password": "DingDong"
 
 }
+
+
+### POST ALL users from local array to MONGODB
+POST http://localhost:3000/api/allusers HTTP/1.1
+Content-Type: application/json
+
+
 
 ### LOGIN JOSEF
 POST http://localhost:3000/api/login HTTP/1.1
@@ -39,6 +60,8 @@ Content-Type: application/json
 
 }
 
+
+
 ### LOGIN MARIA
 POST http://localhost:3000/api/login HTTP/1.1
 Content-Type: application/json
@@ -48,8 +71,6 @@ Content-Type: application/json
     "password": "2345"
 
 }
-
-
 
 
 

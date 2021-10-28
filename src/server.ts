@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import { connectDatabase } from './utils/database';
 import dotenv from 'dotenv';
 dotenv.config();
+import { getUserCollection } from './utils/database';
 
 const app = express();
 const port = 3000;
@@ -30,6 +31,12 @@ const users = [
   { name: 'Magdalena', email: 'lala@ding.de', password: '4567' },
 ];
 
+//Add all users from local array into MongoDB
+app.post('/api/allusers', async (_request, response) => {
+  await getUserCollection().insertMany(users);
+  response.send('Successfully uploaded in DB');
+});
+
 /* app.post('/api/users', (request, response) => {
   const newUser = request.body;
   // users.splice(users.length, 0, newUser.name);
@@ -37,45 +44,48 @@ const users = [
   response.send(`${newUser.name} added`);
 }); */
 
-app.get('/api/me', (request, response) => {
-  const username = request.cookies.username;
-  const foundUser = users.find((user) => user.name === username);
-  if (foundUser) {
-    response.send(foundUser);
+app.get('/api/me', async (request, response) => {
+  const cookieName = request.cookies.username;
+  const dbUser = await getUserCollection().findOne({
+    name: cookieName,
+  });
+  if (dbUser) {
+    response.send(dbUser);
   } else {
-    response.status(404).send('User not found');
+    response.status(404).send(`User not found`);
   }
 });
 
-app.post('/api/users', (request, response) => {
+// MONGO DB stuff
+app.post('/api/users', async (request, response) => {
   const newUser = request.body;
-  if (
-    typeof newUser.name !== 'string' ||
-    typeof newUser.email !== 'string' ||
-    typeof newUser.password !== 'string'
-  ) {
-    response.status(400).send(`Bro, you missed sth!`);
+  if (!newUser.name || !newUser.name || !newUser.password) {
+    response.status(400).send(`Missing property`);
+    return;
   }
-  if (users.some((user) => user.name === request.body.name)) {
-    response.status(409).send(`the user ${request.body.name} already exist`);
+  const isUserThere = await getUserCollection().findOne({
+    name: newUser.name,
+  });
+  if (!isUserThere) {
+    // users.splice(users.length, 0, newUser.name);
+    const writeUser = await getUserCollection().insertOne(newUser);
+    response.send(`${newUser.name} added with ID ${writeUser.insertedId}`);
   } else {
-    users.push(newUser);
-    response.send(users);
+    response.status(409).send(`aleady existst`);
   }
 });
 
-app.post('/api/login', (request, response) => {
-  const userCredentials = request.body;
-  const existingUsers = users.find(
-    (user) =>
-      user.name === userCredentials.name &&
-      user.password === userCredentials.password
-  );
-  if (existingUsers) {
-    response.setHeader('Set-Cookie', `username=${existingUsers.name}`);
-    response.send(`Welcome ${request.body.name} 👋🏼`);
+app.post('/api/login', async (request, response) => {
+  const findUser = request.body;
+  const existingUser = await getUserCollection().findOne({
+    name: findUser.name,
+    password: findUser.password,
+  });
+  if (existingUser) {
+    response.setHeader('Set-Cookie', `username=${existingUser.name}`);
+    response.send(`welcome,${existingUser.name}`);
   } else {
-    response.send('You shall not pass 🥸');
+    response.status(401).send('Password or username incorrect. Try again!');
   }
 });
 
