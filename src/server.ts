@@ -89,17 +89,15 @@ app.post('/api/login', async (request, response) => {
   }
 });
 
-app.delete('/api/users/:name', (request, response) => {
-  const usersIndex = users.findIndex(
-    (user) => user.name === request.params.name
-  );
-  if (usersIndex === -1) {
+/////BUGGYY
+app.delete('/api/users/:name', async (request, response) => {
+  const urlName = request.params.name;
+  const result = await getUserCollection().deleteOne({ name: urlName });
+  if (result) {
+    response.status(404).send(`User ${request.params.name} deleted 😄`);
+  } else {
     response.status(404).send(`User ${request.params.name} doesn't exist 🙈`);
-    return;
   }
-
-  users.splice(usersIndex, 1);
-  response.status(404).send(`User ${request.params.name} deleted 😄`);
 });
 
 app.get('/api/users/:name', (request, response) => {

@@ -20,7 +20,7 @@ GET http://localhost:3000/api/users/Tra HTTP/1.1
 
 
 ### Delete a user, which exists
-DELETE http://localhost:3000/api/users/Tri HTTP/1.1
+DELETE http://localhost:3000/api/users/Jesus HTTP/1.1
 
 
 
